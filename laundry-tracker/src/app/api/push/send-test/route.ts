@@ -3,12 +3,32 @@ import { supabaseServer } from "@/lib/supabase-server";
 import webpush from "web-push";
 
 export async function POST() {
-  // Set VAPID details inside the function to avoid build-time issues
-  webpush.setVapidDetails(
-    process.env.WEB_PUSH_CONTACT!,
-    process.env.WEB_PUSH_PUBLIC_VAPID_KEY!,
-    process.env.WEB_PUSH_PRIVATE_VAPID_KEY!
-  );
+  // Validate and set VAPID details inside the function to avoid build-time issues
+  try {
+    const contact = process.env.WEB_PUSH_CONTACT;
+    const publicKey = process.env.WEB_PUSH_PUBLIC_VAPID_KEY;
+    const privateKey = process.env.WEB_PUSH_PRIVATE_VAPID_KEY;
+
+    if (!contact || !publicKey || !privateKey) {
+      return NextResponse.json(
+        { ok: false, error: "Missing VAPID env. Set WEB_PUSH_CONTACT, WEB_PUSH_PUBLIC_VAPID_KEY, WEB_PUSH_PRIVATE_VAPID_KEY" },
+        { status: 500 }
+      );
+    }
+
+    // contact must be a valid URL (e.g., mailto:you@example.com or https://yourdomain.com/contact)
+    if (!/^mailto:.+@.+\..+$/i.test(contact) && !/^https?:\/\//i.test(contact)) {
+      return NextResponse.json(
+        { ok: false, error: "WEB_PUSH_CONTACT must be a URL (e.g., mailto:you@example.com)" },
+        { status: 400 }
+      );
+    }
+
+    webpush.setVapidDetails(contact, publicKey, privateKey);
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ ok: false, error: errorMessage }, { status: 500 });
+  }
   const supabase = supabaseServer();
   const { data, error } = await supabase.from("subscriptions").select("*").limit(1);
   if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });

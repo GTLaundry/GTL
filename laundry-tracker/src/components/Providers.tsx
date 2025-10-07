@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ReactNode, useEffect, useRef } from "react";
 import { supabaseBrowser } from "@/lib/supabase";
+import { AuthProvider } from "./AuthProvider";
 
 function RealtimeInvalidator() {
   const qc = useQueryClient();
@@ -34,8 +35,10 @@ export default function Providers({ children }: { children: ReactNode }) {
   }
   return (
     <QueryClientProvider client={queryClientRef.current}>
-      <RealtimeInvalidator />
-      {children}
+      <AuthProvider>
+        <RealtimeInvalidator />
+        {children}
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

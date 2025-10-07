@@ -1,5 +1,6 @@
 import "./globals.css";
 import Providers from "@/components/Providers";
+import Navigation from "@/components/Navigation";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <Providers>
+          <Navigation />
           {children}
         </Providers>
         <script dangerouslySetInnerHTML={{
