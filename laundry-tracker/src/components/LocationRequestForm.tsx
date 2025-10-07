@@ -34,7 +34,8 @@ export default function LocationRequestForm() {
         { type: "dryer", count: formData.estimated_dryers }
       ];
 
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('location_requests')
         .insert({
           user_id: user.id,
@@ -62,8 +63,8 @@ export default function LocationRequestForm() {
         estimated_washers: 2,
         estimated_dryers: 2
       });
-    } catch (error: any) {
-      setMessage("Error submitting request: " + error.message);
+    } catch (error: unknown) {
+      setMessage("Error submitting request: " + (error instanceof Error ? error.message : 'An error occurred'));
     } finally {
       setIsSubmitting(false);
     }
@@ -90,7 +91,7 @@ export default function LocationRequestForm() {
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Request New Location</h2>
         <p className="text-gray-600 mb-6">
-          Know of a laundry area that should be tracked? Submit a request and we'll review it!
+          Know of a laundry area that should be tracked? Submit a request and we&apos;ll review it!
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">

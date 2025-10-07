@@ -36,8 +36,10 @@ export default function Navigation() {
           console.log('Admin query failed or no data:', error);
           setIsAdmin(false);
         } else {
-          console.log('Admin query successful, role:', data.role);
-          setIsAdmin(['admin', 'super_admin'].includes(data.role));
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          console.log('Admin query successful, role:', (data as any).role);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setIsAdmin(['admin', 'super_admin'].includes((data as any).role));
         }
       } catch (error) {
         console.error('Error checking admin status:', error);

@@ -45,19 +45,19 @@ async function fetchAnalytics() {
   });
 
   const dailyUsage = last30Days.map(date => {
-    const dayCycles = cycleData?.filter(cycle => 
-      cycle.created_at.startsWith(date)
+    const dayCycles = cycleData?.filter((cycle: {created_at?: string}) => 
+      cycle?.created_at?.startsWith(date)
     ).length || 0;
     return { date, cycles: dayCycles };
   }).reverse();
 
   // Calculate machine utilization
-  const machineUtilization = machineData?.map(machine => {
-    const machineCycles = cycleData?.filter(cycle => cycle.machine_id === machine.id).length || 0;
+  const machineUtilization = machineData?.map((machine: {id: string; name: string; location_id: string}) => {
+    const machineCycles = cycleData?.filter((cycle: {machine_id?: string}) => cycle.machine_id === machine.id).length || 0;
     return {
       id: machine.id,
       name: machine.name,
-      location: locationData?.find(loc => loc.id === machine.location_id)?.name || 'Unknown',
+      location: (locationData as Array<{id: string; name: string}> | undefined)?.find(loc => loc.id === machine.location_id)?.name || 'Unknown',
       cycles: machineCycles,
       utilization: machineCycles / Math.max(1, totalCycles || 1) * 100
     };
@@ -107,21 +107,21 @@ export default function AdminAnalyticsPage() {
   }
 
   // Calculate user registration trends
-  const registrationTrend = analytics?.userRegistrations?.map(reg => ({
-    date: reg.created_at.split('T')[0],
-    count: 1
-  })).reduce((acc, curr) => {
-    const existing = acc.find(item => item.date === curr.date);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      acc.push(curr);
-    }
-    return acc;
-  }, [] as { date: string; count: number }[]) || [];
+  // const registrationTrend = analytics?.userRegistrations?.map(reg => ({
+  //   date: reg.created_at.split('T')[0],
+  //   count: 1
+  // })).reduce((acc, curr) => {
+  //   const existing = acc.find(item => item.date === curr.date);
+  //   if (existing) {
+  //     existing.count += 1;
+  //   } else {
+  //     acc.push(curr);
+  //   }
+  //   return acc;
+  // }, [] as { date: string; count: number }[]) || [];
 
   const maxCycles = Math.max(...(analytics?.dailyUsage?.map(d => d.cycles) || [0]));
-  const maxRegistrations = Math.max(...(registrationTrend.map(r => r.count)));
+  // const maxRegistrations = Math.max(...(registrationTrend.map(r => r.count)));
 
   return (
     <div className="space-y-6">
@@ -270,7 +270,7 @@ export default function AdminAnalyticsPage() {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Usage (Last 30 Days)</h3>
           <div className="space-y-3">
-            {analytics?.dailyUsage?.slice(-7).map((day, index) => (
+            {analytics?.dailyUsage?.slice(-7).map((day) => (
               <div key={day.date} className="flex items-center space-x-3">
                 <div className="w-16 text-xs text-gray-500">
                   {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -329,7 +329,7 @@ export default function AdminAnalyticsPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {analytics?.recentActivity?.slice(0, 8).map((activity) => (
+              {analytics?.recentActivity?.slice(0, 8).map((activity: {id: string; event_type: string; created_at: string; user_id?: string; details?: string}) => (
                 <div key={activity.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -343,7 +343,7 @@ export default function AdminAnalyticsPage() {
                       {activity.event_type.replace(/_/g, ' ')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      User: {activity.user_id.slice(0, 8)}...
+                      User: {activity.user_id?.slice(0, 8) || 'Unknown'}...
                     </p>
                   </div>
                   <div className="flex-shrink-0 text-sm text-gray-500">

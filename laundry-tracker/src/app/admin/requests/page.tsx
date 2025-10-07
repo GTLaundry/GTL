@@ -14,7 +14,8 @@ async function fetchLocationRequests() {
   if (error) throw error;
   
   // Add placeholder user data since we can't access auth.users directly
-  return data?.map(request => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data?.map((request: any) => ({
     ...request,
     users: {
       email: `User ${request.user_id.slice(0, 8)}...`
@@ -25,7 +26,7 @@ async function fetchLocationRequests() {
 export default function AdminRequestsPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<{id: string; name: string; description?: string; estimated_machines?: Array<{type: string; count: number}>; created_at: string; address?: string; contact_email?: string; contact_phone?: string; users?: {email: string}} | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -82,14 +83,18 @@ export default function AdminRequestsPage() {
 
     try {
       const supabase = supabaseBrowser();
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: any = {
+        status: 'approved',
+        reviewed_by: user.id,
+        reviewed_at: new Date().toISOString(),
+        review_notes: reviewNotes
+      };
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('location_requests')
-        .update({
-          status: 'approved',
-          reviewed_by: user.id,
-          reviewed_at: new Date().toISOString(),
-          review_notes: reviewNotes
-        })
+        .update(updateData)
         .eq('id', requestId);
 
       if (error) throw error;
@@ -108,14 +113,18 @@ export default function AdminRequestsPage() {
 
     try {
       const supabase = supabaseBrowser();
-      const { error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: any = {
+        status: 'rejected',
+        reviewed_by: user.id,
+        reviewed_at: new Date().toISOString(),
+        review_notes: reviewNotes
+      };
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
         .from('location_requests')
-        .update({
-          status: 'rejected',
-          reviewed_by: user.id,
-          reviewed_at: new Date().toISOString(),
-          review_notes: reviewNotes
-        })
+        .update(updateData)
         .eq('id', requestId);
 
       if (error) throw error;
@@ -274,7 +283,7 @@ export default function AdminRequestsPage() {
                       </div>
                       <div>
                         <p><span className="font-medium">Estimated machines:</span></p>
-                        <p>{request.estimated_machines?.map((m: any) => `${m.count} ${m.type}s`).join(', ')}</p>
+                        <p>{request.estimated_machines?.map((m: {type: string; count: number}) => `${m.count} ${m.type}s`).join(', ')}</p>
                         <p><span className="font-medium">Submitted:</span> {new Date(request.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
@@ -398,7 +407,7 @@ export default function AdminRequestsPage() {
                 )}
                 <div className="mt-3">
                   <p><span className="font-medium">Estimated Machines:</span></p>
-                  <p className="text-gray-600">{selectedRequest.estimated_machines?.map((m: any) => `${m.count} ${m.type}s`).join(', ')}</p>
+                  <p className="text-gray-600">{selectedRequest.estimated_machines?.map((m: {type: string; count: number}) => `${m.count} ${m.type}s`).join(', ')}</p>
                 </div>
               </div>
 

@@ -14,7 +14,8 @@ async function fetchAuditLog() {
   if (error) throw error;
   
   // Add placeholder admin data since we can't access auth.users directly
-  return data?.map(log => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data?.map((log: any) => ({
     ...log,
     admin: {
       email: `Admin ${log.admin_id.slice(0, 8)}...`
@@ -154,14 +155,14 @@ export default function AdminAuditPage() {
     }
   };
 
-  const formatActionData = (action: string, oldData: any, newData: any) => {
+  const formatActionData = (action: string, oldData: unknown, newData: unknown) => {
     switch (action) {
       case 'promote_user':
-        return `Promoted to ${newData?.role || 'admin'}`;
+        return `Promoted to ${(newData as {role?: string})?.role || 'admin'}`;
       case 'demote_user':
         return `Removed admin privileges`;
       case 'update_user_role':
-        return `Changed from ${oldData?.role || 'unknown'} to ${newData?.role || 'unknown'}`;
+        return `Changed from ${(oldData as {role?: string})?.role || 'unknown'} to ${(newData as {role?: string})?.role || 'unknown'}`;
       case 'approve_request':
         return `Approved location request`;
       case 'reject_request':

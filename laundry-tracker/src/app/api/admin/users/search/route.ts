@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
     const supabase = supabaseServer();
 
     // Search for users by email using admin API
-    const { data, error } = await supabase.auth.admin.listUsers({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.auth.admin as any).listUsers({
       page: 1,
       perPage: 10,
       filter: `email.ilike.%${email}%`
@@ -28,8 +29,10 @@ export async function POST(request: NextRequest) {
       .from('admin_users')
       .select('id');
     
-    const existingAdminIds = existingAdmins?.map(admin => admin.id) || [];
-    const availableUsers = data.users.filter(user => !existingAdminIds.includes(user.id));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingAdminIds = existingAdmins?.map((admin: any) => admin.id) || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const availableUsers = data.users.filter((user: any) => !existingAdminIds.includes(user.id));
 
     return NextResponse.json({ users: availableUsers });
   } catch (error) {

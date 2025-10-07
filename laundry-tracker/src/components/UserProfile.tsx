@@ -33,8 +33,8 @@ export default function UserProfile() {
 
       if (error) throw error;
       setMessage("Profile updated successfully!");
-    } catch (error: any) {
-      setMessage("Error: " + error.message);
+    } catch (error: unknown) {
+      setMessage("Error: " + (error instanceof Error ? error.message : 'An error occurred'));
     } finally {
       setIsLoading(false);
     }

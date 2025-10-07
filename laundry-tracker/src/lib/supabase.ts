@@ -19,9 +19,8 @@ export const supabaseBrowser = () => {
       { 
         auth: { 
           persistSession: true, 
-          autoRefreshToken: true,
-          // Use dynamic redirect URL based on current environment
-          redirectTo: getRedirectUrl()
+          autoRefreshToken: true
+          // redirectTo is not supported in this version of Supabase
         } 
       }
     );

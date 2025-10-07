@@ -19,10 +19,10 @@ export default function SettingsPage() {
 
   const onTest = async () => {
     const r = await fetch("/api/push/send-test", { method: "POST" });
-    let j: any = null;
+    let j: {ok?: boolean; error?: string} | null = null;
     try {
       j = await r.json();
-    } catch (_) {
+    } catch {
       // ensure we handle non-JSON responses gracefully
       setMsg("Error: Failed to parse server response");
       return;

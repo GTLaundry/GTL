@@ -65,7 +65,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Welcome back, {user?.email}. Here's what's happening with your laundry tracker.
+          Welcome back, {user?.email}. Here&apos;s what&apos;s happening with your laundry tracker.
         </p>
       </div>
 
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
               Recent Users
             </h3>
             <div className="space-y-3">
-              {stats?.recentUsers?.map((user: any) => (
+              {stats?.recentUsers?.map((user: {id: string; email?: string; created_at?: string; role?: string}) => (
                 <div key={user.id} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-8 w-8">
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-xs text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString()}
+                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
                   </div>
                 </div>
               ))}
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
               Recent Location Requests
             </h3>
             <div className="space-y-3">
-              {stats?.recentRequests?.map((request: any) => (
+              {stats?.recentRequests?.map((request: {id: string; name: string; status: string; created_at?: string; address?: string}) => (
                 <div key={request.id} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-8 w-8">
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="text-xs text-gray-500">
-                    {new Date(request.created_at).toLocaleDateString()}
+                    {request.created_at ? new Date(request.created_at).toLocaleDateString() : 'Unknown'}
                   </div>
                 </div>
               ))}
